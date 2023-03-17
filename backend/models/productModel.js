@@ -53,7 +53,41 @@ var productSchema = new mongoose.Schema({
         type:Number,
         default:0,
     },
-    
+    reviews:[{
+        user:{
+            type: mongoose.Schema.ObjectId,
+            ref:"User",
+            
+        },
+        name:{
+            type:String,
+            
+        },
+        rating:{
+            type:Number,
+            
+        },
+        comment:{
+            type:String,
+        },
+        time:{
+            type:Date,
+            default:Date.now()
+        },
+
+
+    }],
+
+    user:{
+        type:mongoose.Schema.ObjectId,
+        ref:"User",
+        
+
+    },
+    createAt:{
+        type:Date,
+        default:Date.now()
+    }
 });
 
 //Export the model
