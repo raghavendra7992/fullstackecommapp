@@ -74,8 +74,6 @@ var productSchema = new mongoose.Schema({
             type:Date,
             default:Date.now()
         },
-
-
     }],
 
     user:{

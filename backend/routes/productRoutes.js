@@ -1,10 +1,14 @@
 const express=require('express');
-const { getAllproducts,createProduct } = require('../cnt/productcnt.js');
+const { getAllproducts,createProduct, updateProduct, deleteProduct, singleProduct } = require('../cnt/productcnt.js');
 
 const router=express.Router();
  
 router.get('/product',getAllproducts);
-router.post("/product/newprod",createProduct)
+router.get("/:id",singleProduct);
+router.post("/newprod",createProduct);
+router.put("/:id",updateProduct)
+router.delete("/:id",deleteProduct);
+
 
 
 
