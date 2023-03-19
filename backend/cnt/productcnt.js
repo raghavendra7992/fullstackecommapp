@@ -1,5 +1,6 @@
 const { trusted } = require("mongoose");
-const Product=require("../models/productModel.js")
+const Product=require("../models/productModel.js");
+const ErrorHandler = require("../uitils/Errorhandler.js");
 
 
 
@@ -23,7 +24,7 @@ const getAllproducts=async (req,res)=>{
     })
 }
 
-// update product;
+// update product--Admin product;
 const updateProduct=async (req,res)=>{
     let product=await Product.findById(req.params.id);
     if(!product){
@@ -62,7 +63,7 @@ const deleteProduct=async (req,res)=>{
 }
 
 //single product
-const singleProduct=async (req,res)=>{
+const singleProduct=async (req,res,next)=>{
     const product=await Product.findById(req.params.id);
     if(product){
         return res.status(200).json({
@@ -71,10 +72,7 @@ const singleProduct=async (req,res)=>{
             product:product
         })
     }else{
-        return res.status(500).json({
-            success:false,
-            message:"Product not found",
-        })
+        return next(new ErrorHandler("Product not found"));
     }
 
 }
