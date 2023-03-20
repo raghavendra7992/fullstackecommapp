@@ -1,4 +1,3 @@
-const { trusted } = require("mongoose");
 const Product=require("../models/productModel.js");
 const ErrorHandler = require("../uitils/Errorhandler.js");
 const catchAsyncError=require("../middleware/catchAsyncError.js");
