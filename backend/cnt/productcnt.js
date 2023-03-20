@@ -72,13 +72,14 @@ const singleProduct=async (req,res,next)=>{
             product:product
         })
     }else{
-        return next(new ErrorHandler("Product not found"));
+        return next(new ErrorHandler("Product not found",404));
     }
 
 }
 
 
 module.exports = {
+
     createProduct,
     getAllproducts,
     updateProduct,

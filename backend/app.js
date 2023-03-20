@@ -5,6 +5,7 @@ app.use(express.json())
 const productRouter = require("./routes/productRoutes.js");
 
 app.use("/api/prod",productRouter);
+app.use(ErrorHandler);
 
 
 
