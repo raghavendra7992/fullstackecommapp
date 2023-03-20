@@ -16,5 +16,21 @@ class Features {
         this.query=this.query.find({...keyword})
         return this
     }
+    filter(){
+        const queryCopy={...this.queryStr};
+        //removing some field in category
+        const removeFields=["keyword","page","limit"];
+        removeFields.forEach((key)=>delete queryCopy[key])
+        this.query=this.query.find(queryCopy);
+        return this;
+    }
+    pagination(resultPerPage){
+        const currPage=Number(this.queryStr.page)||1;
+        const skip=resultPerPage*(currPage-1); //resultperpage=10;
+        this.query=this.query.limit(resultPerPage).skip(skip)
+        return this
+    }
+
+
 }
 module.exports=Features;

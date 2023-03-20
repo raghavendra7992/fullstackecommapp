@@ -17,11 +17,19 @@ const createProduct=catchAsyncError(async(req,res,next)=>{
 );
 
 const getAllproducts= catchAsyncError(async (req,res)=>{
-    const feature=new Features(Product.find(),req.query).search()
+    const result=8;
+    const productcount=await Product.countDocuments();
+
+
+    const feature=new Features(Product.find(),req.query)
+    .search()
+    .filter()
+    .pagination(result);
     const product=await feature.query;
     res.status(200).json({
         sucess:true,
-        product
+        product,
+        result
     })
 })
 
@@ -64,7 +72,8 @@ const singleProduct=async (req,res,next)=>{
         return res.status(200).json({
             sucess:true,
             message:"Your product",
-            product:product
+            product:product,
+            productcount
         })
     }else{
         return next(new ErrorHandler("Product not found",404));
@@ -74,7 +83,6 @@ const singleProduct=async (req,res,next)=>{
 
 
 module.exports = {
-
     createProduct,
     getAllproducts,
     updateProduct,
