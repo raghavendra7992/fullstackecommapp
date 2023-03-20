@@ -1,6 +1,7 @@
 const User=require("../models/userModel.js");
 const ErrorHandler = require("../uitils/Errorhandler.js");
 const catchAsyncError=require("../middleware/catchAsyncError.js");
+const sendToken = require("../uitils/jwtToken.js");
 
 
 
@@ -28,30 +29,44 @@ const registerUser=catchAsyncError(async(req,res,next)=>{
 
 //login user
 
-const loginUser=catchAsyncError(async(req,res,next)=>{
-    const {email,password}=req.body;
-    if(!email||!password){
-        return next(new ErrorHandler("Please Enter your email and password",400));
+const loginUser = catchAsyncError(async (req, res, next) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return next(new ErrorHandler("Please enter your email and password", 400));
+    }
+  
+    const user = await User.findOne({ email }).select("+password");
+    if (!user) {
+      return next(new ErrorHandler("User not found", 401));
+    }
+  
+    const isPasswordMatched = await user.comparePassword(password);
+    if (!isPasswordMatched) {
+      return next(new ErrorHandler("Password mismatch", 401));
+    }
+  sendToken(user,200,res)
+   
+  });
 
-    }
-    const user=await User.findOne({email}).select("+password");
-    if(!user){
-        return next(new ErrorHandler("user not found",401))
-    }
-    const isPasswordMatched=await user.comparePassword(password);
+//logoutuser
+const logoutUser = catchAsyncError(async (req, res,next)=>{
+    res.cookie("token", null, {
+        expires: new Date(Date.now()),
+        httpOnly: true,
+      });
+    
+      res.status(200).json({
+        success: true,
+        message: "Log out success",
+      });
+   
 
-    if(!isPasswordMatched){
-        return next(new ErrorHandler("password mismatch",401))
-    }
-    const token=user.getJwtToken()
-        res.status(201).json({
-            success:true,
-            token
-        })
 })
+
 
 
 module.exports ={
     registerUser,
-    loginUser
+    loginUser,
+    logoutUser
 }

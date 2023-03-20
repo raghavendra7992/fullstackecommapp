@@ -1,11 +1,10 @@
 const express = require('express');
-const { registerUser, loginUser } = require('../cnt/usercnt');
+const { registerUser, loginUser, logoutUser } = require('../cnt/usercnt');
 const router = express.Router();
 
 
 router.post("/register",registerUser)
 router.post("/login",loginUser)
-
-
+router.get("/logout",logoutUser)
 
 module.exports =router
