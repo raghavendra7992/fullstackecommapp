@@ -50,24 +50,16 @@ const loginUser = catchAsyncError(async (req, res, next) => {
 
 //logoutuser
 const logoutUser = catchAsyncError(async (req, res,next)=>{
-  try {
-    res.clearCookie("token");
-  
-    res.status(200).json({
-      success: true,
-      message: "Log out success",
-    });
-  
-    next();
-  } catch (error) {
-    next(error);
-  }
+  res.cookie("token", null,
+   {    expires: new Date(Date.now()),
+        httpOnly: true,
+        sameSite:"none",
+        secure:true  })
 
 })
 
-
-
 module.exports ={
+
     registerUser,
     loginUser,
     logoutUser
