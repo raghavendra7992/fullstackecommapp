@@ -2,29 +2,44 @@ const User=require("../models/userModel.js");
 const ErrorHandler = require("../uitils/Errorhandler.js");
 const catchAsyncError=require("../middleware/catchAsyncError.js");
 const sendToken = require("../uitils/jwtToken.js");
-
+const crypto = require("crypto");
+const cloudinary = require("cloudinary").v2;
 
 
 //register user
-const registerUser=catchAsyncError(async(req,res,next)=>{
-    const {name,email,mobile,password}=req.body;
-    const user=await User.create({
-        name,
-        email,
-        mobile,
-        password,
-        avatar:{
-            public_id:"https://www.google.com",
-            url:"https://www.google.com"
-        }
-    })
-    const token=user.getJwtToken();
+const registerUser = catchAsyncError(async (req, res, next) => {
+  const { name, email, password, mobile, avatar } = req.body;
 
-    res.status(201).json({
-        success:true,
-        user,
-        token
-    })
+  // Check if user already exists
+  let user = await User.findOne({ email });
+  if (user) {
+    return next(new ErrorHandler("User already exists", 400));
+  }
+
+  // Upload avatar to cloudinary
+  let myCloud;
+  try {
+    myCloud = await cloudinary.v2.uploader.upload(avatar, {
+      folder: "avatars",
+    });
+  } catch (error) {
+    return next(new ErrorHandler("Error uploading avatar", 500));
+  }
+
+  // Create user
+  try {
+    user = await User.create({
+      name,
+      email,
+      password,
+      mobile,
+      avatar: { public_id: myCloud.public_id, url: myCloud.secure_url },
+    });
+
+    sendToken(user, 201, res);
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
 });
 
 //login user

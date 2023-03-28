@@ -1,17 +1,26 @@
 const app=require("./app");
 const dotenv=require("dotenv");
 const connectionDatabase=require("./config/Database.js");
-
+const cloudinary = require("cloudinary");
 
 process.on("uncaughtException", (err)=>{
     console.log(`Error: ${err.message}`);
     console.log(`not working due to this handling`)
 })
 //config
-dotenv.config({
-    path:"backend/config/.env"
-})
+if(process.env.NODE_ENV!=="PRODUCTION"){
+    require("dotenv").config({
+        path:"backend/config/.env"
+    })}
 connectionDatabase()
+// cloudinary database
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET
+})
+
+
 
 // create server
 const server=app.listen(process.env.PORT,()=>{
@@ -19,8 +28,8 @@ const server=app.listen(process.env.PORT,()=>{
 })
 
 process.on("unhandledRejection",(err)=>{
-    console.log(`Srver crashed due to ${err.message}`);
-    console.log(`Srver crashed`)
+    console.log(`Server crashed due to this :- ${err.message}`);
+    console.log(`Server crashed`)
 
     server.close(()=>{
         process.exit(1)
