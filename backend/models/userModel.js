@@ -2,6 +2,7 @@ const mongoose = require('mongoose'); // Erase if already required
 const validator=require('validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const crypto=require('crypto');
 
 // Declare the Schema of the Mongo model
 var userSchema = new mongoose.Schema({
@@ -44,16 +45,33 @@ var userSchema = new mongoose.Schema({
         type:String,
         default:"user"
     },
+    createdAt: {
+        type: Date,
+        default: Date.now(),
+      },
     resetPasswordToken:String,
     resetPasswordTme:Date,
 });
 
 //hash password
-userSchema.pre('save',async function(next){
-    const hash= await bcrypt.hash(this.password, 10);
-    this.password=hash
-    next();
-});
+userSchema.pre("save", async function (next) {
+    if (!this.isModified("password")) {
+      next();
+    }
+    try {
+      this.password = await bcrypt.hash(this.password, 10);
+      next();
+    } catch (error) {
+      next(error);
+    }
+  });
+
+
+// userSchema.pre('save',async function(next){
+//     const hash= await bcrypt.hash(this.password, 10);
+//     this.password=hash
+//     next();
+// });
 userSchema.methods.getJwtToken = function(){
     return jwt.sign({id:this._id},process.env.SECRET_KEY,{
         expiresIn:process.env.JWT_EXPIRES
