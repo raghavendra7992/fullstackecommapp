@@ -3,14 +3,30 @@ const catchAsyncErrors=require("./catchAsyncError.js");
 const jwt=require("jsonwebtoken");
 const User=require("../models/userModel.js");
 const isAuthenticatedUser=catchAsyncErrors(async (req,res,next)=>{
-    const {token}=req.cookies;
-    if(!token){
-        return next(new ErrorHandler("Please login for access resources ",401));
+    const { token } = req.cookies;
 
+    if (!token) {
+      return next(new ErrorHandler("Please Login for access this resource", 401));
     }
-    const decodeData=jwt.verify(token,process.env.SECRET_KEY);
-    req.User=await User.findById(decodeData.id)
-})
+  
+    const decodedData = jwt.verify(token, process.env.SECRET_KEY);
+  
+    req.user = await User.findById(decodedData.id);
+  
+    next();
+  });
+  
+  // Admin Roles
+  
+const authrizeRoles=(...roles) =>{
+    return (req,res,next) =>{
+        if(!roles.includes(req.user.role)){
+          return next(new ErrorHandler(`${req.user.role} can not access this resources`));
+        };
+        next();
+    }
+}
 module.exports={
-    isAuthenticatedUser
+    isAuthenticatedUser,
+    authrizeRoles
 }
